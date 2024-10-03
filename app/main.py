@@ -12,6 +12,10 @@ def main():
     client, addr = server_socket.accept()
     # print("client and addr are :", client,addr)
     client.send(b"+PONG\r\n")
+            for conn, address in next_client(socket_server):
+            for message in next_message(conn, address):
+                handle_message(message, conn, address)  # type: ignore
+                raise CloseServer("Done")
 
 if __name__ == "__main__":
     main()
