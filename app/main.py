@@ -1,29 +1,27 @@
 import socket
-
+import logging
+from contextlib import contextmanager
+from dataclasses import dataclass
+from app.server import (
+    Address,
+    CloseServer,
+    CloseClient,
+    make_server,
+    next_client,
+    next_message,
+)
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
+def handle_message(message: bytes, conn: socket.socket, address: tuple[str, int]):
+    msg = message.decode("utf-8")
+    if msg.lower() == "*1\r\n$4\r\nping\r\n":
+        conn.send(b"+PONG\r\n")
+    else:
+        log.error(f"Unknown message from {address}: {msg}")
 def main():
-    print("Logs from your program will appear here!")
-
-    # Create server socket
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("localhost", 6379))
-    server_socket.listen()
-
-    print("Server started, waiting for connections...")
-
-    while True:
-        client, addr = server_socket.accept()  # Accept a connection
-        print(f"Accepted connection from {addr}")
-
-        while True:
-            data = client.recv(1024)  # Receive data from the client
-            if not data:
-                break  # No data means the client has closed the connection
-
-            # Check if the received command is PING
-            if data.strip() == b'PING':
-                client.send(b"+PONG\r\n")  # Send the response
-
-        client.close()  # Close the client connection after finishing
-
-if __name__ == "__main__":
-    main()
+    server_addr = Address("localhost", 6379)
+    with make_server(server_addr) as socket_server:
+        for conn, address in next_client(socket_server):
+            for message in next_message(conn, address):
+                handle_message(message, conn, address)  # type: ignore
+                raise CloseServer("Done")
