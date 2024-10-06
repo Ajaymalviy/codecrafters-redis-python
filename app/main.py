@@ -14,16 +14,20 @@ def main():
         client, addr = server_socket.accept()  # Accept a connection
         print(f"Accepted connection from {addr}")
 
-        while True:
-            data = client.recv(1024)  # Receive data from the client
-            if not data:
-                break  # No data means the client has closed the connection
+        try:
+            while True:
+                data = client.recv(1024)  # Receive data from the client
+                if not data:
+                    print(f"Connection closed by {addr}")
+                    break  # No data means the client has closed the connection
 
-            # Check if the received command is PING
-            if data.strip() == b'PING':
-                client.send(b"+PONG\r\n")  # Send the response
-
-        client.close()  # Close the client connection after finishing
+                # Check if the received command is PING in RESP format
+                if data.strip() == b'*1\r\n$4\r\nPING\r\n':
+                    client.send(b"+PONG\r\n")  # Send the response
+                else:
+                    client.send(b"-ERR Unknown command\r\n")  # Handle unknown commands
+        finally:
+            client.close()  # Close the client connection after finishing
 
 if __name__ == "__main__":
     main()
