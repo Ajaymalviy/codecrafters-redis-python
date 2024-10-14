@@ -4,7 +4,7 @@ def test_client():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(("localhost", 6379))
     
-    for _ in range(5):  # Send multiple PING commands
+    for _ in range(2):  # Send multiple PING commands
         client_socket.send(b'PING\r\n')
         response = client_socket.recv(1024)
         print(response.decode())
