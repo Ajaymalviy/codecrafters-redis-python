@@ -26,7 +26,10 @@ class CloseClient(Exception):
 def make_server(address: Address) -> Generator[socket.socket, None, None]:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((address.host, address.port))
+    print(server_socket.bind((address.host,address.port)))
     server_socket.listen()
+
+    print(server_socket.listen())
     log.info(f"Server started on {address.host}:{address.port}")
     try:
         yield server_socket
