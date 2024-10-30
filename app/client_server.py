@@ -10,7 +10,6 @@ def test_client():
         print(response.decode())
 
     client_socket.close()
-
 if __name__ == "__main__":
-    test_client()
-
+    test_client()  #there are multiplke of the think you mat have to ipoe 
+    #aloways of the es theinkk (there are two touppelt of the ssuoorn$$)
